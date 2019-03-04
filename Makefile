@@ -61,12 +61,15 @@ run:
 	cargo run --features "${ENABLE_FEATURES}" --bin tikv-server
 
 release:
-	@cargo build --release --features "${ENABLE_FEATURES}"
+	@cargo build --release --features "${ENABLE_FEATURES}" -vvv
 	@mkdir -p ${BIN_PATH}
 	@cp -f ${CARGO_TARGET_DIR}/release/tikv-ctl ${CARGO_TARGET_DIR}/release/tikv-server ${CARGO_TARGET_DIR}/release/tikv-importer ${BIN_PATH}/
 
-unportable_release:
-	ROCKSDB_SYS_PORTABLE=0 make release
+
+unportable_release: portable_sse_release
+
+portable_sse_release:
+	ROCKSDB_SYS_PORTABLE=1 ROCKSDB_SYS_SSE=1 make release
 
 prof_release:
 	ENABLE_FEATURES=mem-profiling make release
